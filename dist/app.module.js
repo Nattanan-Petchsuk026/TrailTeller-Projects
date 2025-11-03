@@ -14,6 +14,10 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const database_config_1 = __importDefault(require("./config/database.config"));
+const users_module_1 = require("./users/users.module");
+const trips_module_1 = require("./trips/trips.module");
+const destinations_module_1 = require("./destinations/destinations.module");
+const ai_module_1 = require("./ai/ai.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -36,7 +40,13 @@ exports.AppModule = AppModule = __decorate([
                 },
                 inject: [config_1.ConfigService],
             }),
+            users_module_1.UsersModule,
+            trips_module_1.TripsModule,
+            destinations_module_1.DestinationsModule,
+            ai_module_1.AiModule,
         ],
+        controllers: [],
+        providers: [],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
