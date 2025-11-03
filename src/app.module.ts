@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { TripsModule } from './trips/trips.module';
 import { DestinationsModule } from './destinations/destinations.module';
 import { AiModule } from './ai/ai.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AiModule } from './ai/ai.module';
     TripsModule,
     DestinationsModule,
     AiModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

@@ -18,6 +18,7 @@ const users_module_1 = require("./users/users.module");
 const trips_module_1 = require("./trips/trips.module");
 const destinations_module_1 = require("./destinations/destinations.module");
 const ai_module_1 = require("./ai/ai.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,6 +45,7 @@ exports.AppModule = AppModule = __decorate([
             trips_module_1.TripsModule,
             destinations_module_1.DestinationsModule,
             ai_module_1.AiModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [],
         providers: [],
