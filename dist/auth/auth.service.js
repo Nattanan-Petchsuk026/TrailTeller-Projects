@@ -63,6 +63,11 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Token ไม่ถูกต้องหรือหมดอายุ');
         }
     }
+    async updateProfile(userId, updateData) {
+        const user = await this.usersService.update(userId, updateData);
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

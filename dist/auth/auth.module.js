@@ -21,18 +21,19 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             users_module_1.UsersModule,
+            config_1.ConfigModule,
             jwt_1.JwtModule.registerAsync({
                 imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
                 useFactory: (configService) => ({
                     secret: configService.get('JWT_SECRET', 'your-secret-key'),
                     signOptions: { expiresIn: '7d' },
                 }),
-                inject: [config_1.ConfigService],
             }),
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, auth_guard_1.AuthGuard],
-        exports: [auth_service_1.AuthService],
+        exports: [auth_service_1.AuthService, auth_guard_1.AuthGuard, jwt_1.JwtModule],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

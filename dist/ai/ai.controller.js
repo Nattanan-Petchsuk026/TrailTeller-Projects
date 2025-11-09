@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AiController = void 0;
 const common_1 = require("@nestjs/common");
 const ai_service_1 = require("./ai.service");
+const class_validator_1 = require("class-validator");
 class SuggestDestinationsDto {
     budget;
     interests;
@@ -22,6 +23,28 @@ class SuggestDestinationsDto {
     duration;
     preferredSeason;
 }
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], SuggestDestinationsDto.prototype, "budget", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], SuggestDestinationsDto.prototype, "interests", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], SuggestDestinationsDto.prototype, "travelStyle", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], SuggestDestinationsDto.prototype, "duration", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], SuggestDestinationsDto.prototype, "preferredSeason", void 0);
 class GenerateItineraryDto {
     destination;
     startDate;
@@ -29,13 +52,55 @@ class GenerateItineraryDto {
     budget;
     interests;
 }
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], GenerateItineraryDto.prototype, "destination", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], GenerateItineraryDto.prototype, "startDate", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], GenerateItineraryDto.prototype, "endDate", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], GenerateItineraryDto.prototype, "budget", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], GenerateItineraryDto.prototype, "interests", void 0);
 class BestTravelTimeDto {
     destination;
 }
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], BestTravelTimeDto.prototype, "destination", void 0);
 class ChatDto {
     message;
     context;
 }
+__decorate([
+    (0, class_validator_1.IsDefined)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ChatDto.prototype, "message", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ChatDto.prototype, "context", void 0);
+class SearchDestinationsDto {
+    query;
+}
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], SearchDestinationsDto.prototype, "query", void 0);
 let AiController = class AiController {
     aiService;
     constructor(aiService) {
@@ -45,20 +110,14 @@ let AiController = class AiController {
         const suggestion = await this.aiService.suggestDestinations(dto);
         return {
             success: true,
-            data: {
-                suggestion,
-                input: dto,
-            },
+            data: { suggestion, input: dto },
         };
     }
     async generateItinerary(dto) {
         const itinerary = await this.aiService.generateItinerary(dto);
         return {
             success: true,
-            data: {
-                itinerary,
-                input: dto,
-            },
+            data: { itinerary, input: dto },
         };
     }
     async bestTravelTime(dto) {
@@ -72,13 +131,19 @@ let AiController = class AiController {
         };
     }
     async chat(dto) {
+        console.log('✅ Received chat payload:', dto);
         const response = await this.aiService.chat(dto.message, dto.context);
         return {
             success: true,
-            data: {
-                response,
-                message: dto.message,
-            },
+            data: { response, message: dto.message },
+        };
+    }
+    async searchDestinations(dto) {
+        console.log('🔍 Searching for:', dto.query);
+        const results = await this.aiService.searchDestinations(dto.query);
+        return {
+            success: true,
+            data: { results, query: dto.query },
         };
     }
 };
@@ -115,6 +180,14 @@ __decorate([
     __metadata("design:paramtypes", [ChatDto]),
     __metadata("design:returntype", Promise)
 ], AiController.prototype, "chat", null);
+__decorate([
+    (0, common_1.Post)('search-destinations'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [SearchDestinationsDto]),
+    __metadata("design:returntype", Promise)
+], AiController.prototype, "searchDestinations", null);
 exports.AiController = AiController = __decorate([
     (0, common_1.Controller)('ai'),
     __metadata("design:paramtypes", [ai_service_1.AiService])

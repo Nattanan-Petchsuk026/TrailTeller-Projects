@@ -60,7 +60,6 @@ export class AuthService {
 
   async validateToken(token: string) {
     try {
-      // ✅ ระบุ type ให้ payload
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
       const user = await this.usersService.findOneSecure(payload.sub);
       if (!user) {
@@ -70,5 +69,13 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('Token ไม่ถูกต้องหรือหมดอายุ');
     }
+  }
+
+  // ✅ ฟังก์ชันเพิ่มใหม่สำหรับอัปเดตโปรไฟล์
+  async updateProfile(userId: string, updateData: any) {
+    const user = await this.usersService.update(userId, updateData);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }

@@ -41,4 +41,18 @@ export declare class AuthService {
         accessToken: string;
     }>;
     validateToken(token: string): Promise<Omit<import("../users/entities/user.entity").User, "password">>;
+    updateProfile(userId: string, updateData: any): Promise<{
+        id: string;
+        email: string;
+        name: string;
+        phone: string;
+        preferences: {
+            interests?: string[];
+            travelStyle?: "budget" | "comfort" | "luxury";
+            preferredActivities?: string[];
+        };
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
 }

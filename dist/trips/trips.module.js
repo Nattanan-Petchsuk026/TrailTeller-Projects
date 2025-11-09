@@ -12,14 +12,19 @@ const typeorm_1 = require("@nestjs/typeorm");
 const trips_controller_1 = require("./trips.controller");
 const trips_service_1 = require("./trips.service");
 const trip_entity_1 = require("./entities/trip.entity");
+const auth_module_1 = require("../auth/auth.module");
 let TripsModule = class TripsModule {
 };
 exports.TripsModule = TripsModule;
 exports.TripsModule = TripsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([trip_entity_1.Trip])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([trip_entity_1.Trip]),
+            auth_module_1.AuthModule,
+        ],
         controllers: [trips_controller_1.TripsController],
         providers: [trips_service_1.TripsService],
+        exports: [trips_service_1.TripsService],
     })
 ], TripsModule);
 //# sourceMappingURL=trips.module.js.map

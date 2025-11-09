@@ -7,7 +7,7 @@ import { TripsModule } from './trips/trips.module';
 import { DestinationsModule } from './destinations/destinations.module';
 import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
-
+import { FavoritesModule } from './favorites/favorites.module';
 @Module({
   imports: [
     // Config Module - โหลด environment variables
@@ -36,6 +36,7 @@ import { AuthModule } from './auth/auth.module';
     DestinationsModule,
     AiModule,
     AuthModule,
+    FavoritesModule,
   ],
   controllers: [],
   providers: [],

@@ -20,13 +20,16 @@ declare class ChatDto {
     message: string;
     context?: string;
 }
+declare class SearchDestinationsDto {
+    query: string;
+}
 export declare class AiController {
     private readonly aiService;
     constructor(aiService: AiService);
     suggestDestinations(dto: SuggestDestinationsDto): Promise<{
         success: boolean;
         data: {
-            suggestion: string;
+            suggestion: import("./ai.service").TripOption[];
             input: SuggestDestinationsDto;
         };
     }>;
@@ -49,6 +52,13 @@ export declare class AiController {
         data: {
             response: string;
             message: string;
+        };
+    }>;
+    searchDestinations(dto: SearchDestinationsDto): Promise<{
+        success: boolean;
+        data: {
+            results: any[];
+            query: string;
         };
     }>;
 }
