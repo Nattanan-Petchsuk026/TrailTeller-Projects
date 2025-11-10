@@ -9,6 +9,30 @@ export interface TripOption {
     bestTime: string;
     activities: string[];
     reason: string;
+    recommendedHotels?: {
+        name: string;
+        type: string;
+        estimatedPrice: number;
+        location: string;
+    }[];
+    recommendedRestaurants?: {
+        name: string;
+        cuisine: string;
+        specialty: string;
+        priceRange: string;
+    }[];
+    recommendedActivities?: {
+        name: string;
+        type: string;
+        duration: string;
+        cost: string;
+    }[];
+    dayByDayPlan?: {
+        day: number;
+        morning: string;
+        afternoon: string;
+        evening: string;
+    }[];
 }
 interface SuggestDestinationsInput {
     budget: number;
