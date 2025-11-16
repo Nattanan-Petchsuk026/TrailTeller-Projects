@@ -1,14 +1,16 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { WeatherService } from '../weather/weather.service';
+import { BookingsService } from '../bookings/bookings.service';
 
-// ✅ Interface ใหม่ - รองรับข้อมูลครบวงจร
 export interface TripOption {
   destination: string;
   country: string;
@@ -18,29 +20,24 @@ export interface TripOption {
   bestTime: string;
   activities: string[];
   reason: string;
-
-  // ✅ เพิ่มข้อมูลใหม่
   recommendedHotels?: {
     name: string;
-    type: string; // budget, mid-range, luxury
+    type: string;
     estimatedPrice: number;
     location: string;
   }[];
-
   recommendedRestaurants?: {
     name: string;
     cuisine: string;
     specialty: string;
     priceRange: string;
   }[];
-
   recommendedActivities?: {
     name: string;
     type: string;
     duration: string;
     cost: string;
   }[];
-
   dayByDayPlan?: {
     day: number;
     morning: string;
@@ -64,22 +61,23 @@ export class AiService {
   constructor(
     private configService: ConfigService,
     private weatherService: WeatherService,
+    @Inject(forwardRef(() => BookingsService))
+    private bookingsService: BookingsService,
   ) {
     this.model = new ChatGoogleGenerativeAI({
       model: 'gemini-2.0-flash',
       apiKey: this.configService.get<string>('GOOGLE_API_KEY'),
-      temperature: 0.7,
-      maxOutputTokens: 4096, // ✅ เพิ่มเป็น 4096 เพราะต้องการข้อมูลเยอะขึ้น
+      temperature: 0.8,
+      maxOutputTokens: 4096,
     });
   }
 
   /**
-   * ✅ แนะนำจุดหมายปลายทาง (3 ตัวเลือก) - แบบครบวงจร
+   * ✅ แนะนำจุดหมายปลายทาง พร้อมเช็ค API จริง
    */
   async suggestDestinations(
     input: SuggestDestinationsInput,
   ): Promise<TripOption[]> {
-    // ดึงข้อมูลสภาพอากาศ
     const weatherInfo = await Promise.all([
       this.weatherService.getCurrentWeather('Bangkok'),
       this.weatherService.getCurrentWeather('Chiang Mai'),
@@ -100,102 +98,81 @@ export class AiService {
 
     console.log('🌤️  Real-time Weather:', weatherContext);
 
+    const maxBudget = input.budget;
+    const minBudget = Math.floor(input.budget * 0.6);
+    const midBudget = Math.floor(input.budget * 0.8);
+
     const prompt = ChatPromptTemplate.fromMessages([
       [
         'system',
-        `You are TrailTeller AI, an EXPERT ALL-IN-ONE travel planner with REAL-TIME WEATHER DATA.
+        `You are TrailTeller AI, an EXPERT travel planner with REAL-TIME WEATHER DATA.
 
 🌤️ CURRENT WEATHER DATA:
 ${weatherContext || 'Weather data unavailable'}
 
-YOUR MISSION: Generate EXACTLY 3 COMPLETE destination packages. Each package must include:
-✅ Destination info
-✅ Hotel recommendations (3 options: budget/mid-range/luxury)
-✅ Restaurant recommendations (3 must-try places)
-✅ Activity recommendations (5 things to do)
-✅ Day-by-day itinerary plan
+💰 CRITICAL BUDGET CONSTRAINTS:
+- User's TOTAL budget: ${maxBudget.toLocaleString()} THB for ${input.duration} days
+- Your recommendations MUST stay within this budget (including flights, hotels, food, activities)
+- Suggest 3 DIFFERENT destinations with varying budget allocations:
+  * Option 1: Budget-friendly (~${minBudget.toLocaleString()} THB)
+  * Option 2: Mid-range (~${midBudget.toLocaleString()} THB)  
+  * Option 3: Near maximum budget (~${maxBudget.toLocaleString()} THB)
+
+🎯 DIVERSITY REQUIREMENTS:
+- Each destination MUST be COMPLETELY DIFFERENT (different regions/countries)
+- NO DUPLICATES - if you suggest "เชียงใหม่", don't suggest it again
+- Mix domestic and international destinations based on budget
+- Consider travel style: ${input.travelStyle}
+
+YOUR MISSION: Generate EXACTLY 3 COMPLETE destination packages that:
+✅ Stay within budget (including ALL costs)
+✅ Are geographically diverse
+✅ Match user interests: ${input.interests.join(', ')}
+✅ Include realistic pricing for hotels, flights, activities
 
 CRITICAL: Respond with ONLY valid JSON. No markdown, no explanation.
 
 Return format:
 [
   {{
-    "destination": "ชื่อเมือง",
+    "destination": "ชื่อเมือง (ต้องไม่ซ้ำกับตัวเลือกอื่น)",
     "country": "ชื่อประเทศ",
-    "duration": จำนวนวัน (number),
-    "estimatedBudget": งบประมาณโดยประมาณ (number),
+    "duration": ${input.duration},
+    "estimatedBudget": จำนวนเงินที่ไม่เกิน ${maxBudget} (number),
     "highlights": ["ไฮไลท์1", "ไฮไลท์2", "ไฮไลท์3"],
     "bestTime": "ช่วงเวลาที่เหมาะสม",
     "activities": ["กิจกรรม1", "กิจกรรม2", "กิจกรรม3"],
-    "reason": "เหตุผลที่แนะนำ (1-2 ประโยค)",
-    
-    "recommendedHotels": [
-      {{
-        "name": "ชื่อโรงแรม",
-        "type": "budget|mid-range|luxury",
-        "estimatedPrice": ราคาโดยประมาณต่อคืน (number),
-        "location": "ทำเล"
-      }}
-    ],
-    
-    "recommendedRestaurants": [
-      {{
-        "name": "ชื่อร้าน",
-        "cuisine": "ประเภทอาหาร",
-        "specialty": "เมนูเด็ด",
-        "priceRange": "฿฿-฿฿฿"
-      }}
-    ],
-    
-    "recommendedActivities": [
-      {{
-        "name": "ชื่อกิจกรรม",
-        "type": "adventure|culture|relax|food",
-        "duration": "ระยะเวลา",
-        "cost": "ค่าใช้จ่าย"
-      }}
-    ],
-    
-    "dayByDayPlan": [
-      {{
-        "day": 1,
-        "morning": "กิจกรรมช่วงเช้า",
-        "afternoon": "กิจกรรมช่วงบ่าย",
-        "evening": "กิจกรรมช่วงเย็น"
-      }}
-    ]
+    "reason": "เหตุผลที่แนะนำ พร้อมระบุว่าอยู่ในงบประมาณ (1-2 ประโยค)"
   }}
 ]
 
 RULES:
 - ALL text in Thai language
-- Match budget & travel style realistically
-- Duration must match user input
-- Suggest DIVERSE destinations (different regions/countries)
+- estimatedBudget MUST NOT exceed ${maxBudget}
+- Each destination must be UNIQUE (no duplicates)
 - Use REAL-TIME WEATHER data for recommendations
-- Hotels: ALWAYS include 3 options (budget, mid-range, luxury)
-- Restaurants: 3 must-try places with realistic names
-- Activities: 5 varied activities matching interests
-- Day-by-day plan: Create realistic daily itinerary
-- Keep descriptions SHORT and practical
-- All prices must be realistic numbers`,
+- Travel style "${input.travelStyle}" affects recommendations
+- Keep descriptions SHORT and practical`,
       ],
       [
         'user',
-        `งบประมาณ: {budget} บาท
+        `งบประมาณ: {budget} บาท (สูงสุด)
 ความสนใจ: {interests}
 สไตล์การเดินทาง: {travelStyle}
 ระยะเวลา: {duration} วัน
 ฤดูกาลที่ชอบ: {preferredSeason}
 
-กรุณาสร้างแพ็กเกจทริปที่สมบูรณ์ 3 ตัวเลือก พร้อมโรงแรม ร้านอาหาร กิจกรรม และแผนการเดินทางรายวัน`,
+กรุณาสร้างแพ็กเกจทริปที่หลากหลาย 3 ตัวเลือก โดยแต่ละตัวเลือกต้อง:
+- อยู่ในงบประมาณที่กำหนด
+- เป็นสถานที่ที่แตกต่างกัน (ห้ามซ้ำ)
+- มีค่าใช้จ่ายรวมที่สมเหตุสมผล`,
       ],
     ]);
 
     const chain = prompt.pipe(this.model).pipe(new StringOutputParser());
 
     const response = await chain.invoke({
-      budget: input.budget.toLocaleString('th-TH'),
+      budget: maxBudget.toLocaleString('th-TH'),
       interests: input.interests.join(', '),
       travelStyle: input.travelStyle,
       duration: input.duration,
@@ -209,7 +186,22 @@ RULES:
         .trim();
 
       const options = JSON.parse(cleanResponse) as TripOption[];
-      console.log('✅ AI generated complete trip packages:', options.length);
+      
+      // ตรวจสอบว่าไม่มีจุดหมายซ้ำ
+      const destinations = options.map(o => o.destination);
+      const uniqueDestinations = new Set(destinations);
+      if (destinations.length !== uniqueDestinations.size) {
+        console.warn('⚠️ AI suggested duplicate destinations, regenerating...');
+        return this.getDefaultOptions(input);
+      }
+
+      // ตรวจสอบงบประมาณ
+      const overBudget = options.filter(o => o.estimatedBudget > maxBudget);
+      if (overBudget.length > 0) {
+        console.warn('⚠️ Some options exceed budget:', overBudget);
+      }
+
+      console.log('✅ AI generated diverse trip packages:', options.length);
       return options;
     } catch (err) {
       console.error('Failed to parse AI response:', response, err);
@@ -218,7 +210,122 @@ RULES:
   }
 
   /**
-   * ✅ สร้างแผนการเดินทาง (Itinerary) แบบละเอียดพร้อมโรงแรม+ร้านอาหาร
+   * ✅ ค้นหาโรงแรมที่อยู่ในงบประมาณ
+   */
+  async searchAffordableHotels(params: {
+    destination: string;
+    checkIn: string;
+    checkOut: string;
+    guests: number;
+    maxBudgetPerNight: number;
+    duration: number;
+  }) {
+    console.log(`🏨 Searching hotels with max ${params.maxBudgetPerNight}/night`);
+    
+    const allHotels = await this.bookingsService.searchHotels({
+      destination: params.destination,
+      checkIn: params.checkIn,
+      checkOut: params.checkOut,
+      guests: params.guests,
+    });
+
+    // กรองโรงแรมที่อยู่ในงบ (คำนวณรวมทั้งหมด)
+    const affordableHotels = allHotels.filter((hotel: any) => {
+      const totalHotelCost = hotel.price * params.duration;
+      return totalHotelCost <= params.maxBudgetPerNight * params.duration * 1.2; // เผื่อ 20%
+    });
+
+    // เรียงตามราคา (ถูก -> แพง)
+    affordableHotels.sort((a: any, b: any) => a.price - b.price);
+
+    console.log(`✅ Found ${affordableHotels.length} affordable hotels`);
+    return affordableHotels;
+  }
+
+  /**
+   * ✅ ค้นหาเที่ยวบินที่อยู่ในงบประมาณ
+   */
+  async searchAffordableFlights(params: {
+    origin: string;
+    destination: string;
+    departureDate: string;
+    returnDate: string;
+    passengers: number;
+    maxBudgetTotal: number;
+    seatClass?: string;
+  }) {
+    console.log(`✈️ Searching flights with max budget ${params.maxBudgetTotal} THB`);
+    
+    const allFlights = await this.bookingsService.searchFlights({
+      origin: params.origin,
+      destination: params.destination,
+      departureDate: params.departureDate,
+      returnDate: params.returnDate,
+      passengers: params.passengers,
+      seatClass: params.seatClass,
+    });
+
+    // กรองเที่ยวบินที่อยู่ในงบ
+    const affordableFlights = allFlights.filter((flight: any) => {
+      const totalFlightCost = flight.price * params.passengers;
+      return totalFlightCost <= params.maxBudgetTotal;
+    });
+
+    // เรียงตามราคา (ถูก -> แพง)
+    affordableFlights.sort((a: any, b: any) => a.price - b.price);
+
+    console.log(`✅ Found ${affordableFlights.length} affordable flights`);
+    return affordableFlights;
+  }
+
+  /**
+   * ✅ ค้นหาร้านอาหารที่เหมาะสมกับงบประมาณ
+   */
+  async searchAffordableRestaurants(params: {
+    destination: string;
+    date: string;
+    partySize: number;
+    remainingBudget: number;
+    cuisine?: string;
+  }) {
+    console.log(`🍽️ Budget left for restaurants: ${params.remainingBudget} THB`);
+    
+    const allRestaurants = await this.bookingsService.searchRestaurants({
+      destination: params.destination,
+      date: params.date,
+      partySize: params.partySize,
+      cuisine: params.cuisine,
+    });
+
+    // แปลง priceRange เป็นตัวเลข
+    const getPriceLevel = (priceRange: string): number => {
+      const bahtCount = (priceRange.match(/฿/g) || []).length;
+      return bahtCount;
+    };
+
+    // กรองตามงบที่เหลือ
+    let affordableRestaurants = allRestaurants;
+    const budgetPercent = params.remainingBudget / 30000; // สมมติว่างบเต็มคือ 30,000
+
+    if (budgetPercent < 0.3) {
+      // งบเหลือน้อย (< 30%) -> เอาแค่ ฿ และ ฿฿
+      affordableRestaurants = allRestaurants.filter((r: any) => 
+        getPriceLevel(r.priceRange) <= 2
+      );
+    } else if (budgetPercent < 0.5) {
+      // งบเหลือปานกลาง (30-50%) -> เอาแค่ ฿฿฿ ลงมา
+      affordableRestaurants = allRestaurants.filter((r: any) => 
+        getPriceLevel(r.priceRange) <= 3
+      );
+    }
+    // ถ้างบเหลือเยอะ (> 50%) -> แสดงทั้งหมด
+
+    console.log(`✅ Found ${affordableRestaurants.length} suitable restaurants`);
+    return affordableRestaurants;
+  }
+
+  /**
+   * ✅ สร้างแผนการเดินทาง (Itinerary)
    */
   async generateItinerary(input: {
     destination: string;
@@ -269,6 +376,7 @@ FORMAT (CRITICAL):
 💵 รวมค่าใช้จ่ายวันนี้: XXX บาท
 
 IMPORTANT:
+- Total cost must not exceed budget: ${input.budget} THB
 - Include specific restaurant names (realistic)
 - Show meal recommendations for breakfast, lunch, dinner
 - Add hotel recommendations
@@ -285,10 +393,10 @@ IMPORTANT:
 จุดหมาย: {destination}
 วันที่เริ่มต้น: {startDate}
 วันที่สิ้นสุด: {endDate}
-งบประมาณ: {budget} บาท
+งบประมาณ: {budget} บาท (สูงสุด)
 ความสนใจ: {interests}
 
-กรุณาสร้างแผนการเดินทางแบบวันต่อวัน พร้อมแนะนำโรงแรม ร้านอาหาร กิจกรรม และค่าใช้จ่ายทุกอย่าง`,
+กรุณาสร้างแผนการเดินทางแบบวันต่อวัน พร้อมแนะนำโรงแรม ร้านอาหาร กิจกรรม และค่าใช้จ่ายที่ไม่เกินงบประมาณ`,
       ],
     ]);
 
@@ -306,7 +414,7 @@ IMPORTANT:
   }
 
   /**
-   * ✅ แนะนำช่วงเวลาที่ดีที่สุด (ใช้ข้อมูลสภาพอากาศจริง)
+   * ✅ แนะนำช่วงเวลาที่ดีที่สุด
    */
   async suggestBestTravelTime(destination: string): Promise<string> {
     const currentWeather =
@@ -347,7 +455,7 @@ Always respond in Thai language with:
   }
 
   /**
-   * ✅ Chat กับ AI (รองรับคำถามเกี่ยวกับโรงแรม ร้านอาหาร กิจกรรม)
+   * ✅ Chat กับ AI
    */
   async chat(message: string, context?: string): Promise<string> {
     const prompt = ChatPromptTemplate.fromMessages([
@@ -387,7 +495,7 @@ ${context ? `Context: ${context}` : ''}`,
   }
 
   /**
-   * ✅ ค้นหาสถานที่ท่องเที่ยว (พร้อมโรงแรม+ร้านอาหารแนะนำ)
+   * ✅ ค้นหาสถานที่ท่องเที่ยว
    */
   async searchDestinations(query: string): Promise<any[]> {
     const prompt = ChatPromptTemplate.fromMessages([
@@ -395,18 +503,14 @@ ${context ? `Context: ${context}` : ''}`,
         'system',
         `You are TrailTeller's destination search expert.
 
-Search for destinations and include complete recommendations:
-- Top attractions
-- 2-3 hotel options (various price ranges)
-- 2-3 restaurant recommendations
-- Must-do activities
+Search for destinations and include complete recommendations.
 
-CRITICAL: Respond with ONLY valid JSON array (5 results). No markdown.
+CRITICAL: Respond with ONLY valid JSON array (5 UNIQUE results). No markdown.
 
 Format:
 [
   {{
-    "name": "ชื่อสถานที่",
+    "name": "ชื่อสถานที่ (ต้องไม่ซ้ำกัน)",
     "country": "ชื่อประเทศ",
     "description": "คำอธิบายสั้นๆ (ไม่เกิน 2 ประโยค)",
     "tags": ["tag1", "tag2", "tag3"],
@@ -427,7 +531,7 @@ Format:
 
 RULES:
 - Always Thai language
-- Return EXACTLY 5 destinations
+- Return EXACTLY 5 UNIQUE destinations (no duplicates)
 - Match search intent
 - Be specific and practical
 - estimatedBudget must be realistic number`,
@@ -453,42 +557,44 @@ RULES:
   }
 
   /**
-   * Default options (fallback)
+   * Default options (fallback) - ปรับให้หลากหลาย
    */
   private getDefaultOptions(input: SuggestDestinationsInput): TripOption[] {
+    const maxBudget = input.budget;
     return [
       {
         destination: 'เชียงใหม่',
         country: 'ไทย',
         duration: input.duration || 3,
-        estimatedBudget: Math.min(input.budget, 15000),
+        estimatedBudget: Math.min(maxBudget * 0.6, 15000),
         highlights: ['วัดพระธาทุดอยสุเทพ', 'ตลาดวโรรส', 'ถนนคนเดินนิมมาน'],
         bestTime: 'พฤศจิกายน-กุมภาพันธ์',
         activities: ['เที่ยวชมวัด', 'ช้อปปิ้ง', 'ลิ้มรสอาหารเหนือ'],
-        reason: 'เมืองท่องเที่ยวยอดนิยม อากาศดี อาหารอร่อย',
+        reason: 'เมืองท่องเที่ยวยอดนิยม อากาศดี อาหารอร่อย อยู่ในงบประมาณ',
         recommendedHotels: [
-          // eslint-disable-next-line prettier/prettier
           { name: 'โรงแรมเชียงใหม่เกท', type: 'budget', estimatedPrice: 800, location: 'ใจกลางเมือง' },
-          // eslint-disable-next-line prettier/prettier
-          { name: 'Akyra Manor Chiang Mai', type: 'mid-range', estimatedPrice: 2500, location: 'นิมมาน' },
-          // eslint-disable-next-line prettier/prettier
-          { name: 'Dhara Dhevi', type: 'luxury', estimatedPrice: 8000, location: 'แม่ริม' },
+          { name: 'Akyra Manor', type: 'mid-range', estimatedPrice: 2500, location: 'นิมมาน' },
         ],
-        recommendedRestaurants: [
-          // eslint-disable-next-line prettier/prettier
-          { name: 'ข้าวซอยลำดวน', cuisine: 'อาหารเหนือ', specialty: 'ข้าวซอย', priceRange: '฿' },
-          // eslint-disable-next-line prettier/prettier
-          { name: 'SP Chicken', cuisine: 'อาหารไทย', specialty: 'ไก่ย่าง', priceRange: '฿' },
-          // eslint-disable-next-line prettier/prettier
-          { name: 'The Service 1921', cuisine: 'Fine Dining', specialty: 'อาหารฝรั่งเศส', priceRange: '฿฿฿' },
-        ],
-        recommendedActivities: [
-          // eslint-disable-next-line prettier/prettier
-          { name: 'วัดพระธาทุดอยสุเทพ', type: 'culture', duration: '3 ชม.', cost: '50 บาท' },
-          { name: 'ตลาดวโรรส', type: 'food', duration: '2 ชม.', cost: 'ฟรี' },
-          // eslint-disable-next-line prettier/prettier
-          { name: 'ถนนคนเดินนิมมาน', type: 'relax', duration: '2-3 ชม.', cost: 'ฟรี' },
-        ],
+      },
+      {
+        destination: 'กระบี่',
+        country: 'ไทย',
+        duration: input.duration || 3,
+        estimatedBudget: Math.min(maxBudget * 0.8, 25000),
+        highlights: ['อ่าวนาง', 'เกาะพีพี', 'ถ้ำพระนาง'],
+        bestTime: 'พฤศจิกายน-เมษายน',
+        activities: ['ดำน้ำ', 'นั่งเรือ', 'ผ่อนคลายชายหาด'],
+        reason: 'ทะเลสวย บรรยากาศเงียบสงบ เหมาะกับงบประมาณระดับกลาง',
+      },
+      {
+        destination: 'เชียงราย',
+        country: 'ไทย',
+        duration: input.duration || 3,
+        estimatedBudget: Math.min(maxBudget, 20000),
+        highlights: ['วัดร่องขุ่น', 'สามเหลี่ยมทองคำ', 'บ้านดำ'],
+        bestTime: 'พฤศจิกายน-กุมภาพันธ์',
+        activities: ['ชมวัด', 'ชิมชา', 'ถ่ายรูป'],
+        reason: 'สถานที่ท่องเที่ยวที่แปลกตา อยู่ในงบประมาณ',
       },
     ];
   }

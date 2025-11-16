@@ -12,12 +12,17 @@ const config_1 = require("@nestjs/config");
 const ai_service_1 = require("./ai.service");
 const ai_controller_1 = require("./ai.controller");
 const weather_module_1 = require("../weather/weather.module");
+const bookings_module_1 = require("../bookings/bookings.module");
 let AiModule = class AiModule {
 };
 exports.AiModule = AiModule;
 exports.AiModule = AiModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule, weather_module_1.WeatherModule],
+        imports: [
+            config_1.ConfigModule,
+            weather_module_1.WeatherModule,
+            (0, common_1.forwardRef)(() => bookings_module_1.BookingsModule),
+        ],
         controllers: [ai_controller_1.AiController],
         providers: [ai_service_1.AiService],
         exports: [ai_service_1.AiService],

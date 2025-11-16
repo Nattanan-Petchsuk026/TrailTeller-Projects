@@ -8,6 +8,9 @@ import { DestinationsModule } from './destinations/destinations.module';
 import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { ExpensesModule } from './expenses/expenses.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { PaymentModule } from './payment/payment.module';
 @Module({
   imports: [
     // Config Module - โหลด environment variables
@@ -37,6 +40,9 @@ import { FavoritesModule } from './favorites/favorites.module';
     AiModule,
     AuthModule,
     FavoritesModule,
+    ExpensesModule,
+    BookingsModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [],

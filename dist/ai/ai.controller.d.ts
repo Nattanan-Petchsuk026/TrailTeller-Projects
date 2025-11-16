@@ -61,5 +61,38 @@ export declare class AiController {
             query: string;
         };
     }>;
+    searchAffordableHotels(dto: {
+        destination: string;
+        checkIn: string;
+        checkOut: string;
+        guests: number;
+        maxBudgetPerNight: number;
+        duration: number;
+    }): Promise<{
+        success: boolean;
+        data: any[];
+    }>;
+    searchAffordableFlights(dto: {
+        origin: string;
+        destination: string;
+        departureDate: string;
+        returnDate: string;
+        passengers: number;
+        maxBudgetTotal: number;
+        seatClass?: string;
+    }): Promise<{
+        success: boolean;
+        data: any[];
+    }>;
+    searchAffordableRestaurants(dto: {
+        destination: string;
+        date: string;
+        partySize: number;
+        remainingBudget: number;
+        cuisine?: string;
+    }): Promise<{
+        success: boolean;
+        data: any[];
+    }>;
 }
 export {};

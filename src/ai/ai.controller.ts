@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { AiService } from './ai.service';
 import {
   IsString,
@@ -8,7 +15,10 @@ import {
   IsDefined,
 } from 'class-validator';
 
-// DTOs for request validation
+// ---------------------------------------------------------
+// DTO Definitions
+// ---------------------------------------------------------
+
 class SuggestDestinationsDto {
   @IsNumber()
   budget: number;
@@ -65,6 +75,10 @@ class SearchDestinationsDto {
   @IsString()
   query: string;
 }
+
+// ---------------------------------------------------------
+// Controller
+// ---------------------------------------------------------
 
 @Controller('ai')
 export class AiController {
@@ -129,7 +143,7 @@ export class AiController {
   }
 
   /**
-   * POST /ai/search-destinations (✅ ฟังก์ชันใหม่)
+   * POST /ai/search-destinations
    */
   @Post('search-destinations')
   @HttpCode(HttpStatus.OK)
@@ -140,5 +154,65 @@ export class AiController {
       success: true,
       data: { results, query: dto.query },
     };
+  }
+
+  // ---------------------------------------------------------------------
+  // ⭐ NEW: Affordable Hotels Search
+  // ---------------------------------------------------------------------
+  @Post('search-affordable-hotels')
+  @HttpCode(HttpStatus.OK)
+  async searchAffordableHotels(
+    @Body()
+    dto: {
+      destination: string;
+      checkIn: string;
+      checkOut: string;
+      guests: number;
+      maxBudgetPerNight: number;
+      duration: number;
+    },
+  ) {
+    const hotels = await this.aiService.searchAffordableHotels(dto);
+    return { success: true, data: hotels };
+  }
+
+  // ---------------------------------------------------------------------
+  // ⭐ NEW: Affordable Flights Search
+  // ---------------------------------------------------------------------
+  @Post('search-affordable-flights')
+  @HttpCode(HttpStatus.OK)
+  async searchAffordableFlights(
+    @Body()
+    dto: {
+      origin: string;
+      destination: string;
+      departureDate: string;
+      returnDate: string;
+      passengers: number;
+      maxBudgetTotal: number;
+      seatClass?: string;
+    },
+  ) {
+    const flights = await this.aiService.searchAffordableFlights(dto);
+    return { success: true, data: flights };
+  }
+
+  // ---------------------------------------------------------------------
+  // ⭐ NEW: Affordable Restaurants Search
+  // ---------------------------------------------------------------------
+  @Post('search-affordable-restaurants')
+  @HttpCode(HttpStatus.OK)
+  async searchAffordableRestaurants(
+    @Body()
+    dto: {
+      destination: string;
+      date: string;
+      partySize: number;
+      remainingBudget: number;
+      cuisine?: string;
+    },
+  ) {
+    const restaurants = await this.aiService.searchAffordableRestaurants(dto);
+    return { success: true, data: restaurants };
   }
 }

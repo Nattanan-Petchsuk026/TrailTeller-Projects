@@ -146,6 +146,18 @@ let AiController = class AiController {
             data: { results, query: dto.query },
         };
     }
+    async searchAffordableHotels(dto) {
+        const hotels = await this.aiService.searchAffordableHotels(dto);
+        return { success: true, data: hotels };
+    }
+    async searchAffordableFlights(dto) {
+        const flights = await this.aiService.searchAffordableFlights(dto);
+        return { success: true, data: flights };
+    }
+    async searchAffordableRestaurants(dto) {
+        const restaurants = await this.aiService.searchAffordableRestaurants(dto);
+        return { success: true, data: restaurants };
+    }
 };
 exports.AiController = AiController;
 __decorate([
@@ -188,6 +200,30 @@ __decorate([
     __metadata("design:paramtypes", [SearchDestinationsDto]),
     __metadata("design:returntype", Promise)
 ], AiController.prototype, "searchDestinations", null);
+__decorate([
+    (0, common_1.Post)('search-affordable-hotels'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AiController.prototype, "searchAffordableHotels", null);
+__decorate([
+    (0, common_1.Post)('search-affordable-flights'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AiController.prototype, "searchAffordableFlights", null);
+__decorate([
+    (0, common_1.Post)('search-affordable-restaurants'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AiController.prototype, "searchAffordableRestaurants", null);
 exports.AiController = AiController = __decorate([
     (0, common_1.Controller)('ai'),
     __metadata("design:paramtypes", [ai_service_1.AiService])

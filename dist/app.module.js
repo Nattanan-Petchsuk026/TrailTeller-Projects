@@ -20,6 +20,9 @@ const destinations_module_1 = require("./destinations/destinations.module");
 const ai_module_1 = require("./ai/ai.module");
 const auth_module_1 = require("./auth/auth.module");
 const favorites_module_1 = require("./favorites/favorites.module");
+const expenses_module_1 = require("./expenses/expenses.module");
+const bookings_module_1 = require("./bookings/bookings.module");
+const payment_module_1 = require("./payment/payment.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,6 +51,9 @@ exports.AppModule = AppModule = __decorate([
             ai_module_1.AiModule,
             auth_module_1.AuthModule,
             favorites_module_1.FavoritesModule,
+            expenses_module_1.ExpensesModule,
+            bookings_module_1.BookingsModule,
+            payment_module_1.PaymentModule,
         ],
         controllers: [],
         providers: [],
