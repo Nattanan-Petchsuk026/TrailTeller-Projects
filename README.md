@@ -21,7 +21,7 @@ This is the recommended method as the project is already configured with Docker.
 First, clone the project to your local machine and navigate into the directory:
 
 ```sh
-git clone https://github.com/Kittikanning/TrailTeller.git
+git clone [https://github.com/Kittikanning/TrailTeller.git](https://github.com/Nattanan-Petchsuk026/TrailTeller-Projects/tree/main)
 cd trail-teller
 ```
 
@@ -126,6 +126,7 @@ backend/recommendation/
 
 
 This [Docker Compose for Beginners](https://www.youtube.com/watch?v=KQUiICpM_u0) video may be helpful as it explains how to use `docker-compose.yml` files to run services, which is central to this project's setup.
+
 
 
 
