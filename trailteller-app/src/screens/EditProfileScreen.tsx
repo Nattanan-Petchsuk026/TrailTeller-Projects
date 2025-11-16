@@ -5,13 +5,21 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../store/authStore';
 import { updateProfile } from '../api/auth';
+import {
+  ChevronLeft,
+  User,
+  Phone,
+  Heart,
+  Save,
+} from 'lucide-react-native';
 
 const INTERESTS_OPTIONS = [
   { label: '🏖️ ชายหาด', value: 'beach' },
@@ -73,78 +81,149 @@ export default function EditProfileScreen({ navigation }: any) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← ยกเลิก</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>แก้ไขโปรไฟล์</Text>
-        <TouchableOpacity onPress={handleSave} disabled={loading}>
-          <Text style={[styles.saveButton, loading && styles.saveButtonDisabled]}>
-            บันทึก
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView style={styles.content}>
-        <View style={styles.form}>
-          <Text style={styles.label}>ชื่อ-นามสกุล *</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="กรอกชื่อของคุณ"
-            value={name}
-            onChangeText={setName}
-            editable={!loading}
-          />
-
-          <Text style={styles.label}>เบอร์โทรศัพท์</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="0812345678"
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-            editable={!loading}
-          />
-
-          <Text style={styles.label}>ความสนใจ</Text>
-          <Text style={styles.sublabel}>เลือกสิ่งที่คุณชอบเพื่อให้ AI แนะนำทริปที่ใช่</Text>
-          <View style={styles.interestsContainer}>
-            {INTERESTS_OPTIONS.map((interest) => (
-              <TouchableOpacity
-                key={interest.value}
-                style={[
-                  styles.interestChip,
-                  selectedInterests.includes(interest.value) &&
-                    styles.interestChipSelected,
-                ]}
-                onPress={() => toggleInterest(interest.value)}
-                disabled={loading}
-              >
-                <Text
-                  style={[
-                    styles.interestText,
-                    selectedInterests.includes(interest.value) &&
-                      styles.interestTextSelected,
-                  ]}
-                >
-                  {interest.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <LinearGradient
+        colors={['#0066FF', '#0047B3'] as const}
+        style={styles.headerGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.header}>
           <TouchableOpacity
-            style={[styles.saveButtonBottom, loading && styles.saveButtonBottomDisabled]}
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <ChevronLeft size={28} color="#FFFFFF" strokeWidth={2.5} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>แก้ไขโปรไฟล์</Text>
+          <TouchableOpacity
+            style={styles.saveHeaderButton}
             onPress={handleSave}
             disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.saveButtonText}>💾 บันทึกการเปลี่ยนแปลง</Text>
-            )}
+            <Save size={20} color="#FFFFFF" strokeWidth={2.5} />
           </TouchableOpacity>
+        </View>
+      </LinearGradient>
+
+      <ScrollView 
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.form}>
+          {/* Name Input */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <User size={20} color="#0066FF" strokeWidth={2.5} />
+              <Text style={styles.sectionTitle}>ชื่อ-นามสกุล</Text>
+            </View>
+            <View style={styles.inputCard}>
+              <View style={styles.inputWrapper}>
+                <View style={styles.inputIconContainer}>
+                  <User size={20} color="#0066FF" strokeWidth={2} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="กรอกชื่อของคุณ"
+                  placeholderTextColor="#94A3B8"
+                  value={name}
+                  onChangeText={setName}
+                  editable={!loading}
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Phone Input */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Phone size={20} color="#10B981" strokeWidth={2.5} />
+              <Text style={styles.sectionTitle}>เบอร์โทรศัพท์</Text>
+            </View>
+            <View style={styles.inputCard}>
+              <View style={styles.inputWrapper}>
+                <View style={styles.inputIconContainer}>
+                  <Phone size={20} color="#10B981" strokeWidth={2} />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="0812345678"
+                  placeholderTextColor="#94A3B8"
+                  value={phone}
+                  onChangeText={setPhone}
+                  keyboardType="phone-pad"
+                  editable={!loading}
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Interests */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Heart size={20} color="#EF4444" strokeWidth={2.5} />
+              <Text style={styles.sectionTitle}>ความสนใจ</Text>
+            </View>
+            <Text style={styles.sublabel}>
+              เลือกสิ่งที่คุณชอบเพื่อให้ AI แนะนำทริปที่ใช่
+            </Text>
+            <View style={styles.interestsContainer}>
+              {INTERESTS_OPTIONS.map((interest) => (
+                <TouchableOpacity
+                  key={interest.value}
+                  style={[
+                    styles.interestChip,
+                    selectedInterests.includes(interest.value) &&
+                      styles.interestChipSelected,
+                  ]}
+                  onPress={() => toggleInterest(interest.value)}
+                  disabled={loading}
+                >
+                  <Text
+                    style={[
+                      styles.interestText,
+                      selectedInterests.includes(interest.value) &&
+                        styles.interestTextSelected,
+                    ]}
+                  >
+                    {interest.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Save Button */}
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            <LinearGradient
+              colors={
+                loading
+                  ? ['#94A3B8', '#64748B']
+                  : (['#10B981', '#059669'] as const)
+              }
+              style={styles.saveButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              {loading ? (
+                <>
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                  <Text style={styles.saveButtonText}>กำลังบันทึก...</Text>
+                </>
+              ) : (
+                <>
+                  <Save size={20} color="#FFFFFF" strokeWidth={2.5} />
+                  <Text style={styles.saveButtonText}>บันทึกการเปลี่ยนแปลง</Text>
+                </>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <View style={{ height: 40 }} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -154,59 +233,97 @@ export default function EditProfileScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#F8FAFC',
+  },
+  headerGradient: {
+    paddingBottom: 16,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
   backButton: {
-    fontSize: 16,
-    color: '#e74c3c',
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: -0.3,
   },
-  saveButton: {
-    fontSize: 16,
-    color: '#2ecc71',
-    fontWeight: '600',
-  },
-  saveButtonDisabled: {
-    color: '#95a5a6',
+  saveHeaderButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,
   },
   form: {
-    padding: 20,
+    padding: 16,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2c3e50',
-    marginBottom: 8,
-    marginTop: 16,
+  section: {
+    marginBottom: 24,
   },
-  sublabel: {
-    fontSize: 12,
-    color: '#7f8c8d',
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 12,
   },
-  input: {
-    backgroundColor: '#fff',
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.3,
+  },
+  sublabel: {
+    fontSize: 13,
+    color: '#64748B',
+    marginBottom: 12,
+    fontWeight: '500',
+    lineHeight: 20,
+  },
+  inputCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
+    borderColor: '#E2E8F0',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
-    fontSize: 16,
+    gap: 12,
+  },
+  inputIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F8FAFC',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  input: {
+    flex: 1,
+    fontSize: 15,
+    color: '#0F172A',
+    fontWeight: '600',
   },
   interestsContainer: {
     flexDirection: 'row',
@@ -214,38 +331,51 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   interestChip: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
   interestChipSelected: {
-    backgroundColor: '#3498db',
-    borderColor: '#3498db',
+    backgroundColor: '#0066FF',
+    borderColor: '#0066FF',
   },
   interestText: {
     fontSize: 14,
-    color: '#2c3e50',
+    color: '#0F172A',
+    fontWeight: '600',
   },
   interestTextSelected: {
-    color: '#fff',
-    fontWeight: '600',
+    color: '#FFFFFF',
   },
-  saveButtonBottom: {
-    backgroundColor: '#2ecc71',
-    borderRadius: 12,
-    padding: 18,
+  saveButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginTop: 8,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  saveButtonGradient: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 32,
-  },
-  saveButtonBottomDisabled: {
-    backgroundColor: '#95a5a6',
+    justifyContent: 'center',
+    paddingVertical: 18,
+    gap: 10,
   },
   saveButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
 });

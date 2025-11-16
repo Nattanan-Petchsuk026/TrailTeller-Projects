@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Calendar } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface DatePickerInputProps {
   label: string;
@@ -71,8 +72,11 @@ export default function DatePickerInput({
         style={[styles.button, disabled && styles.buttonDisabled]}
         onPress={() => !disabled && setShow(true)}
         disabled={disabled}
+        activeOpacity={0.7}
       >
-        <Calendar size={20} color="#64748B" strokeWidth={2} />
+        <View style={styles.iconContainer}>
+          <Calendar size={20} color="#0066FF" strokeWidth={2.5} />
+        </View>
         <Text style={[styles.buttonText, !value && styles.placeholder]}>
           {formatDisplayDate(value)}
         </Text>
@@ -96,7 +100,14 @@ export default function DatePickerInput({
             style={styles.iosDoneButton}
             onPress={() => setShow(false)}
           >
-            <Text style={styles.iosDoneButtonText}>เสร็จสิ้น</Text>
+            <LinearGradient
+              colors={['#0066FF', '#0047B3'] as const}
+              style={styles.iosDoneButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Text style={styles.iosDoneButtonText}>เสร็จสิ้น</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       )}
@@ -106,49 +117,70 @@ export default function DatePickerInput({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 0,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2c3e50',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0F172A',
     marginBottom: 8,
+    letterSpacing: -0.2,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#E2E8F0',
     borderRadius: 12,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     gap: 12,
   },
   buttonDisabled: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8FAFC',
     opacity: 0.6,
   },
+  iconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   buttonText: {
-    fontSize: 16,
-    color: '#2c3e50',
-    fontWeight: '500',
+    flex: 1,
+    fontSize: 15,
+    color: '#0F172A',
+    fontWeight: '600',
+    letterSpacing: -0.2,
   },
   placeholder: {
-    color: '#95a5a6',
+    color: '#94A3B8',
+    fontWeight: '500',
   },
   iosButtonContainer: {
     marginTop: 12,
     alignItems: 'flex-end',
   },
   iosDoneButton: {
-    backgroundColor: '#3498db',
+    borderRadius: 10,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  iosDoneButtonGradient: {
     paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingVertical: 12,
   },
   iosDoneButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
 });

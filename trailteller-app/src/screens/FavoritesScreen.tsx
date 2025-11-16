@@ -13,6 +13,15 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getAllFavorites, deleteFavorite, Favorite } from '../api/favorites';
+import {
+  ChevronLeft,
+  MapPin,
+  Trash2,
+  Sparkles,
+  Calendar,
+  Heart,
+  Star,
+} from 'lucide-react-native';
 
 export default function FavoritesScreen({ navigation }: any) {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -88,93 +97,119 @@ export default function FavoritesScreen({ navigation }: any) {
     );
   };
 
-  const renderFavoriteCard = ({ item }: { item: Favorite }) => (
+  const renderFavoriteCard = ({ item, index }: { item: Favorite; index: number }) => (
     <View style={styles.card}>
-      <TouchableOpacity
-        style={styles.cardContent}
-        onPress={() => handleCreateTrip(item)}
-        activeOpacity={0.8}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.destinationInfo}>
-            <Text style={styles.destination}>{item.destination}</Text>
-            {item.country && (
-              <Text style={styles.country}>📍 {item.country}</Text>
-            )}
-          </View>
-          <TouchableOpacity
-            onPress={() => handleDelete(item)}
-            style={styles.deleteIcon}
-          >
-            <Text style={styles.deleteIconText}>❌</Text>
-          </TouchableOpacity>
+      <View style={styles.cardHeader}>
+        <View style={styles.favoriteIndicator}>
+          <Heart size={16} color="#EF4444" fill="#EF4444" strokeWidth={0} />
         </View>
-
-        {item.description && (
-          <Text style={styles.description} numberOfLines={2}>
-            {item.description}
-          </Text>
-        )}
-
-        {item.tags && item.tags.length > 0 && (
-          <View style={styles.tagsContainer}>
-            {item.tags.map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {item.aiSuggestions && (
-          <View style={styles.suggestionsContainer}>
-            {item.aiSuggestions.estimatedBudget && (
-              <View style={styles.suggestionItem}>
-                <Text style={styles.suggestionIcon}>💰</Text>
-                <Text style={styles.suggestionText}>
-                  ~฿{item.aiSuggestions.estimatedBudget.toLocaleString()}
-                </Text>
-              </View>
-            )}
-            {item.aiSuggestions.duration && (
-              <View style={styles.suggestionItem}>
-                <Text style={styles.suggestionIcon}>⏱️</Text>
-                <Text style={styles.suggestionText}>
-                  {item.aiSuggestions.duration} วัน
-                </Text>
-              </View>
-            )}
-            {item.aiSuggestions.bestTime && (
-              <View style={styles.suggestionItem}>
-                <Text style={styles.suggestionIcon}>📅</Text>
-                <Text style={styles.suggestionText}>
-                  {item.aiSuggestions.bestTime}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-
         <TouchableOpacity
-          style={styles.createTripButton}
-          onPress={() => handleCreateTrip(item)}
+          onPress={() => handleDelete(item)}
+          style={styles.deleteButton}
         >
-          <LinearGradient
-            colors={['#667eea', '#764ba2']}
-            style={styles.createTripGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Text style={styles.createTripText}>✈️ สร้างทริป</Text>
-          </LinearGradient>
+          <Trash2 size={18} color="#EF4444" strokeWidth={2} />
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.destinationHeader}>
+        <Text style={styles.destinationName}>{item.destination}</Text>
+        {item.country && (
+          <View style={styles.countryRow}>
+            <MapPin size={14} color="#64748B" strokeWidth={2} />
+            <Text style={styles.country}>{item.country}</Text>
+          </View>
+        )}
+      </View>
+
+      {item.description && (
+        <Text style={styles.description} numberOfLines={2}>
+          {item.description}
+        </Text>
+      )}
+
+      {item.tags && item.tags.length > 0 && (
+        <View style={styles.tagsContainer}>
+          {item.tags.slice(0, 3).map((tag, i) => (
+            <View key={i} style={styles.tag}>
+              <Text style={styles.tagText}>{tag}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {item.aiSuggestions && (
+        <View style={styles.infoGrid}>
+          {item.aiSuggestions.bestTime && (
+            <View style={styles.infoBox}>
+              <View style={styles.infoIconContainer}>
+                <Calendar size={16} color="#0066FF" strokeWidth={2} />
+              </View>
+              <Text style={styles.infoLabel}>ช่วงเวลา</Text>
+              <Text style={styles.infoValue}>{item.aiSuggestions.bestTime}</Text>
+            </View>
+          )}
+          {item.aiSuggestions.estimatedBudget && (
+            <View style={styles.infoBox}>
+              <View style={styles.infoIconContainer}>
+                <Text style={styles.infoCurrency}>฿</Text>
+              </View>
+              <Text style={styles.infoLabel}>งบประมาณ</Text>
+              <Text style={styles.infoValue}>
+                {item.aiSuggestions.estimatedBudget.toLocaleString('th-TH')}
+              </Text>
+            </View>
+          )}
+          {item.aiSuggestions.duration && (
+            <View style={styles.infoBox}>
+              <View style={styles.infoIconContainer}>
+                <Text style={styles.infoDuration}>⏱️</Text>
+              </View>
+              <Text style={styles.infoLabel}>ระยะเวลา</Text>
+              <Text style={styles.infoValue}>{item.aiSuggestions.duration} วัน</Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {item.aiSuggestions?.highlights && item.aiSuggestions.highlights.length > 0 && (
+        <View style={styles.highlightsContainer}>
+          <View style={styles.highlightsTitleRow}>
+            <Star size={14} color="#F59E0B" fill="#F59E0B" strokeWidth={0} />
+            <Text style={styles.highlightsTitle}>ไฮไลท์</Text>
+          </View>
+          {item.aiSuggestions.highlights.slice(0, 2).map((highlight, i) => (
+            <View key={i} style={styles.highlightItem}>
+              <View style={styles.highlightDot} />
+              <Text style={styles.highlightText} numberOfLines={1}>
+                {highlight}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      <TouchableOpacity
+        style={styles.createTripButton}
+        onPress={() => handleCreateTrip(item)}
+      >
+        <LinearGradient
+          colors={['#0066FF', '#0047B3'] as const}
+          style={styles.createTripGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <Sparkles size={18} color="#FFFFFF" strokeWidth={2.5} />
+          <Text style={styles.createTripText}>วางแผนทริป</Text>
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyIcon}>❤️</Text>
+      <View style={styles.emptyIconContainer}>
+        <Heart size={48} color="#94A3B8" strokeWidth={2} />
+      </View>
       <Text style={styles.emptyTitle}>ยังไม่มีสถานที่โปรด</Text>
       <Text style={styles.emptySubtitle}>
         เริ่มเพิ่มจุดหมายที่อยากไปในอนาคตกันเลย!
@@ -185,15 +220,26 @@ export default function FavoritesScreen({ navigation }: any) {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>← กลับ</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>สถานที่โปรด</Text>
-          <View style={{ width: 50 }} />
-        </View>
+        <LinearGradient
+          colors={['#0066FF', '#0047B3'] as const}
+          style={styles.headerGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <ChevronLeft size={28} color="#FFFFFF" strokeWidth={2.5} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>สถานที่โปรด</Text>
+            <View style={styles.headerRight} />
+          </View>
+        </LinearGradient>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3498db" />
+          <ActivityIndicator size="large" color="#0066FF" />
+          <Text style={styles.loadingText}>กำลังโหลด...</Text>
         </View>
       </SafeAreaView>
     );
@@ -201,13 +247,34 @@ export default function FavoritesScreen({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← กลับ</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>สถานที่โปรด</Text>
-        <View style={{ width: 50 }} />
-      </View>
+      <LinearGradient
+        colors={['#0066FF', '#0047B3'] as const}
+        style={styles.headerGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <ChevronLeft size={28} color="#FFFFFF" strokeWidth={2.5} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>สถานที่โปรด</Text>
+          <View style={styles.headerRight} />
+        </View>
+      </LinearGradient>
+
+      {favorites.length > 0 && (
+        <View style={styles.resultsHeader}>
+          <Text style={styles.resultsCount}>
+            {favorites.length} สถานที่โปรด
+          </Text>
+          <Text style={styles.resultsSubtitle}>
+            จุดหมายที่คุณอยากไป
+          </Text>
+        </View>
+      )}
 
       <FlatList
         data={favorites}
@@ -218,8 +285,14 @@ export default function FavoritesScreen({ navigation }: any) {
         }
         ListEmptyComponent={renderEmptyState}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            tintColor="#0066FF"
+            colors={['#0066FF']}
+          />
         }
+        showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
@@ -228,148 +301,271 @@ export default function FavoritesScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#F8FAFC',
+  },
+  headerGradient: {
+    paddingBottom: 16,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
   backButton: {
-    fontSize: 16,
-    color: '#3498db',
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: -0.4,
+  },
+  headerRight: {
+    width: 40,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  resultsHeader: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  resultsCount: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 4,
+    letterSpacing: -0.3,
+  },
+  resultsSubtitle: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '500',
+  },
   listContainer: {
-    padding: 16,
+    paddingBottom: 20,
   },
   emptyListContainer: {
     flexGrow: 1,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginTop: 16,
     borderRadius: 16,
-    marginBottom: 16,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 3,
-  },
-  cardContent: {
-    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 12,
   },
-  destinationInfo: {
-    flex: 1,
+  favoriteIndicator: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FEE2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  destination: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 4,
+  deleteButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FEE2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  destinationHeader: {
+    marginBottom: 12,
+  },
+  destinationName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 6,
+    letterSpacing: -0.5,
+  },
+  countryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   country: {
     fontSize: 14,
-    color: '#7f8c8d',
-  },
-  deleteIcon: {
-    padding: 4,
-  },
-  deleteIconText: {
-    fontSize: 20,
+    color: '#64748B',
+    fontWeight: '600',
   },
   description: {
     fontSize: 14,
-    color: '#2c3e50',
-    lineHeight: 20,
-    marginBottom: 12,
+    color: '#475569',
+    lineHeight: 22,
+    marginBottom: 16,
+    fontWeight: '500',
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   tag: {
-    backgroundColor: '#e8f4f8',
+    backgroundColor: '#EFF6FF',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   tagText: {
     fontSize: 12,
-    color: '#3498db',
+    color: '#0066FF',
     fontWeight: '600',
   },
-  suggestionsContainer: {
+  infoGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 12,
     marginBottom: 16,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#F1F5F9',
   },
-  suggestionItem: {
-    flexDirection: 'row',
+  infoBox: {
+    flex: 1,
     alignItems: 'center',
   },
-  suggestionIcon: {
-    fontSize: 16,
-    marginRight: 4,
+  infoIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  suggestionText: {
+  infoCurrency: {
+    fontSize: 16,
+    color: '#0066FF',
+    fontWeight: '700',
+  },
+  infoDuration: {
+    fontSize: 16,
+  },
+  infoLabel: {
+    fontSize: 11,
+    color: '#94A3B8',
+    marginBottom: 4,
+    fontWeight: '600',
+  },
+  infoValue: {
     fontSize: 13,
-    color: '#7f8c8d',
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.2,
+  },
+  highlightsContainer: {
+    marginBottom: 16,
+  },
+  highlightsTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 10,
+  },
+  highlightsTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  highlightItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  highlightDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: '#0066FF',
+    marginRight: 10,
+    marginTop: 7,
+  },
+  highlightText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#475569',
+    lineHeight: 20,
+    fontWeight: '500',
   },
   createTripButton: {
-    borderRadius: 8,
+    borderRadius: 10,
     overflow: 'hidden',
   },
   createTripGradient: {
-    paddingVertical: 12,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    gap: 8,
   },
   createTripText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 40,
+    paddingVertical: 80,
   },
-  emptyIcon: {
-    fontSize: 80,
-    marginBottom: 20,
+  emptyIconContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
   },
   emptyTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#0F172A',
     marginBottom: 8,
+    letterSpacing: -0.3,
   },
   emptySubtitle: {
-    fontSize: 16,
-    color: '#7f8c8d',
+    fontSize: 14,
+    color: '#64748B',
     textAlign: 'center',
+    lineHeight: 20,
+    fontWeight: '500',
   },
 });

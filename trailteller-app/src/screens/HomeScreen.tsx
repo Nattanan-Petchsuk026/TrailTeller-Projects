@@ -12,17 +12,17 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useAuthStore } from "../store/authStore";
 import { logout } from "../api/auth";
 import { 
-  Plane, 
-  MessageCircle, 
-  Calendar, 
-  MapPin, 
   User, 
   Sparkles,
-  Star,
+  MapPin,
+  Calendar,
   ChevronRight,
   LogOut,
+  Compass,
+  Hotel,
+  UtensilsCrossed,
+  Ticket,
   TrendingUp,
-  ListChecks,
   Bot
 } from "lucide-react-native";
 
@@ -32,15 +32,6 @@ interface QuickAction {
   subtitle: string;
   color: readonly [string, string];
   screen: string;
-}
-
-interface Destination {
-  id: string;
-  name: string;
-  country: string;
-  icon: string;
-  price: string;
-  rating: number;
 }
 
 export default function HomeScreen({ navigation }: any) {
@@ -60,48 +51,76 @@ export default function HomeScreen({ navigation }: any) {
     ]);
   };
 
-  const quickActions: QuickAction[] = [
+  // 🎯 Main Features - สิ่งที่ผู้ใช้ทำได้
+  const mainFeatures: QuickAction[] = [
     {
-      icon: Plane,
-      title: "วางแผนทริป",
-      subtitle: "เริ่มต้นการผจญภัย",
+      icon: Sparkles,
+      title: "วางแผนทริปใหม่",
+      subtitle: "AI จัดให้ทุกอย่าง",
       color: ["#FF6B6B", "#FF8E53"] as const,
       screen: "NewTrip",
     },
     {
-      icon: Bot,
-      title: "ถาม AI",
-      subtitle: "คำแนะนำจาก AI",
-      color: ["#4ECDC4", "#44A08D"] as const,
-      screen: "AIAssistant",
-    },
-    {
       icon: Calendar,
       title: "ทริปของฉัน",
-      subtitle: "ดูทริปที่บันทึกไว้",
-      color: ["#FFB84D", "#F59E0B"] as const,
+      subtitle: "ดูและจัดการทริป",
+      color: ["#4ECDC4", "#44A08D"] as const,
       screen: "MyTrips",
+    },
+  ];
+
+  // 🔥 Popular Services
+  const popularServices = [
+    {
+      icon: Hotel,
+      title: "ค้นหาโรงแรม",
+      subtitle: "ที่พักคุณภาพดี",
+      color: "#0066FF",
+      screen: "HotelSearch",
+    },
+    {
+      icon: UtensilsCrossed,
+      title: "ร้านอาหาร",
+      subtitle: "แนะนำร้านดัง",
+      color: "#F59E0B",
+      onPress: () => Alert.alert("Coming Soon", "ฟีเจอร์นี้กำลังพัฒนา"),
+    },
+    {
+      icon: Ticket,
+      title: "กิจกรรม & ทัวร์",
+      subtitle: "สำรวจกิจกรรม",
+      color: "#8B5CF6",
+      onPress: () => Alert.alert("Coming Soon", "ฟีเจอร์นี้กำลังพัฒนา"),
     },
     {
       icon: MapPin,
-      title: "ค้นหาจุดหมาย",
-      subtitle: "สำรวจสถานที่ใหม่",
-      color: ["#A78BFA", "#8B5CF6"] as const,
+      title: "แหล่งท่องเที่ยว",
+      subtitle: "จุดหมายยอดนิยม",
+      color: "#10B981",
       screen: "Search",
     },
   ];
 
-  const recommendedDestinations: Destination[] = [
-    { id: "1", name: "โตเกียว", country: "ญี่ปุ่น", icon: "🗼", price: "35,000", rating: 4.9 },
-    { id: "2", name: "บาหลี", country: "อินโดนีเซีย", icon: "🏖️", price: "25,000", rating: 4.8 },
-    { id: "3", name: "เชียงใหม่", country: "ไทย", icon: "⛰️", price: "8,000", rating: 4.7 },
-    { id: "4", name: "โซล", country: "เกาหลีใต้", icon: "🏙️", price: "30,000", rating: 4.8 },
+  // 🎨 AI Features
+  const aiFeatures = [
+    {
+      icon: Bot,
+      title: "AI ผู้ช่วย",
+      subtitle: "คุยกับ AI ตลอด 24 ชม.",
+      screen: "AIAssistant",
+    },
+    {
+      icon: Compass,
+      title: "แนะนำเส้นทาง",
+      subtitle: "ให้ AI วางแผนทริป",
+      screen: "Itinerary",
+    },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header with Profile - Agoda Style */}
+        {/* Header with Profile */}
         <LinearGradient
           colors={["#0066FF", "#0047B3"] as const}
           style={styles.headerGradient}
@@ -121,52 +140,58 @@ export default function HomeScreen({ navigation }: any) {
             </TouchableOpacity>
           </View>
 
-          {/* AI Assistant Card - Inside Header */}
-          <View style={styles.aiCard}>
-            <View style={styles.aiCardContent}>
-              <View style={styles.aiIconContainer}>
-                <Sparkles size={24} color="#0066FF" strokeWidth={2.5} />
+          {/* 🎯 Hero Section - แนะนำฟีเจอร์หลัก */}
+          <View style={styles.heroCard}>
+            <View style={styles.heroContent}>
+              <View style={styles.heroIconContainer}>
+                <Sparkles size={28} color="#0066FF" strokeWidth={2.5} />
               </View>
-              <View style={styles.aiCardText}>
-                <Text style={styles.aiCardTitle}>AI ผู้ช่วยท่องเที่ยว</Text>
-                <Text style={styles.aiCardSubtitle}>
-                  พร้อมช่วยวางแผนทริปในฝันของคุณ
+              <View style={styles.heroText}>
+                <Text style={styles.heroTitle}>วางแผนทริปใหม่</Text>
+                <Text style={styles.heroSubtitle}>
+                  ✨ AI จัดการให้ครบ ตั้งแต่โรงแรม กิจกรรม ไปจนถึงการจอง
                 </Text>
               </View>
             </View>
             <TouchableOpacity
-              style={styles.aiCardButton}
+              style={styles.heroButton}
               onPress={() => navigation.navigate("NewTrip")}
             >
-              <Text style={styles.aiCardButtonText}>เริ่มวางแผน</Text>
+              <Text style={styles.heroButtonText}>เริ่มวางแผน</Text>
               <ChevronRight size={18} color="#FFFFFF" strokeWidth={3} />
             </TouchableOpacity>
           </View>
         </LinearGradient>
 
-        {/* Quick Actions */}
+        {/* 🎯 Main Features */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ฟีเจอร์หลัก</Text>
-          <View style={styles.quickActionsGrid}>
-            {quickActions.map((action, index) => (
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>ฟีเจอร์หลัก</Text>
+            <View style={styles.trendingBadge}>
+              <TrendingUp size={12} color="#10B981" strokeWidth={2.5} />
+              <Text style={styles.trendingText}>ยอดนิยม</Text>
+            </View>
+          </View>
+          <View style={styles.mainFeaturesGrid}>
+            {mainFeatures.map((feature, index) => (
               <TouchableOpacity
                 key={index}
-                onPress={() => navigation.navigate(action.screen)}
+                onPress={() => navigation.navigate(feature.screen)}
                 activeOpacity={0.8}
-                style={styles.quickActionWrapper}
+                style={styles.mainFeatureWrapper}
               >
                 <LinearGradient
-                  colors={action.color}
-                  style={styles.quickActionCard}
+                  colors={feature.color}
+                  style={styles.mainFeatureCard}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
-                  <View style={styles.quickActionIconContainer}>
-                    <action.icon size={28} color="#FFFFFF" strokeWidth={2.5} />
+                  <View style={styles.mainFeatureIconContainer}>
+                    <feature.icon size={32} color="#FFFFFF" strokeWidth={2.5} />
                   </View>
-                  <Text style={styles.quickActionTitle}>{action.title}</Text>
-                  <Text style={styles.quickActionSubtitle}>
-                    {action.subtitle}
+                  <Text style={styles.mainFeatureTitle}>{feature.title}</Text>
+                  <Text style={styles.mainFeatureSubtitle}>
+                    {feature.subtitle}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -174,116 +199,66 @@ export default function HomeScreen({ navigation }: any) {
           </View>
         </View>
 
-        {/* Recommended Destinations */}
+        {/* 🔥 บริการยอดนิยม */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View>
-              <Text style={styles.sectionTitle}>จุดหมายยอดนิยม</Text>
-              <Text style={styles.sectionSubtitle}>โปรโมชั่นและข้อเสนอพิเศษ</Text>
-            </View>
-            <TouchableOpacity 
-              style={styles.seeAllButton}
-              onPress={() => navigation.navigate("Search")}
-            >
-              <Text style={styles.seeAllText}>ดูทั้งหมด</Text>
-              <ChevronRight size={16} color="#0066FF" strokeWidth={2.5} />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.destinationsScroll}
-          >
-            {recommendedDestinations.map((dest) => (
+          <Text style={styles.sectionTitle}>บริการยอดนิยม</Text>
+          <View style={styles.servicesGrid}>
+            {popularServices.map((service, index) => (
               <TouchableOpacity
-                key={dest.id}
-                style={styles.destinationCard}
-                onPress={() => {
-                  Alert.alert(
-                    dest.name,
-                    `คุณสนใจเดินทางไป${dest.name}หรือไม่?`,
-                    [
-                      { text: "ยกเลิก", style: "cancel" },
-                      {
-                        text: "วางแผนทริป",
-                        onPress: () => navigation.navigate("NewTrip"),
-                      },
-                    ]
-                  );
-                }}
+                key={index}
+                style={styles.serviceCard}
+                onPress={() => 
+                  service.screen 
+                    ? navigation.navigate(service.screen)
+                    : service.onPress?.()
+                }
+                activeOpacity={0.7}
               >
-                <View style={styles.destinationImageContainer}>
-                  <Text style={styles.destinationEmoji}>{dest.icon}</Text>
-                  <View style={styles.ratingBadge}>
-                    <Star size={12} color="#FFB84D" fill="#FFB84D" strokeWidth={0} />
-                    <Text style={styles.ratingBadgeText}>{dest.rating}</Text>
-                  </View>
+                <View 
+                  style={[
+                    styles.serviceIconContainer,
+                    { backgroundColor: service.color + '15' }
+                  ]}
+                >
+                  <service.icon 
+                    size={24} 
+                    color={service.color} 
+                    strokeWidth={2.5} 
+                  />
                 </View>
-                <View style={styles.destinationInfo}>
-                  <Text style={styles.destinationName}>{dest.name}</Text>
-                  <View style={styles.destinationLocationRow}>
-                    <MapPin size={12} color="#64748B" strokeWidth={2} />
-                    <Text style={styles.destinationCountry}>{dest.country}</Text>
-                  </View>
-                  <View style={styles.destinationFooter}>
-                    <View>
-                      <Text style={styles.priceLabel}>เริ่มต้น</Text>
-                      <Text style={styles.destinationPrice}>
-                        ฿{dest.price}
-                      </Text>
-                    </View>
-                    <View style={styles.bookButton}>
-                      <Text style={styles.bookButtonText}>จอง</Text>
-                    </View>
-                  </View>
+                <View style={styles.serviceInfo}>
+                  <Text style={styles.serviceTitle}>{service.title}</Text>
+                  <Text style={styles.serviceSubtitle}>
+                    {service.subtitle}
+                  </Text>
                 </View>
+                <ChevronRight size={20} color="#CBD5E1" strokeWidth={2} />
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
-        {/* Popular Features */}
+        {/* 🤖 AI Features */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>บริการของเรา</Text>
-            <View style={styles.trendingBadge}>
-              <TrendingUp size={12} color="#10B981" strokeWidth={2.5} />
-              <Text style={styles.trendingText}>ยอดนิยม</Text>
-            </View>
-          </View>
-          
-          <TouchableOpacity
-            style={styles.featureCard}
-            onPress={() => navigation.navigate("Itinerary")}
-          >
-            <View style={styles.featureIconContainer}>
-              <ListChecks size={24} color="#0066FF" strokeWidth={2.5} />
-            </View>
-            <View style={styles.featureContent}>
-              <Text style={styles.featureTitle}>สร้างแผนการเดินทาง</Text>
-              <Text style={styles.featureSubtitle}>
-                AI จะช่วยสร้างแผนวันต่อวันให้คุณ
-              </Text>
-            </View>
-            <ChevronRight size={24} color="#CBD5E1" strokeWidth={2} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.featureCard}
-            onPress={() => navigation.navigate("AIAssistant")}
-          >
-            <View style={styles.featureIconContainer}>
-              <MessageCircle size={24} color="#0066FF" strokeWidth={2.5} />
-            </View>
-            <View style={styles.featureContent}>
-              <Text style={styles.featureTitle}>คุยกับ AI ผู้ช่วย</Text>
-              <Text style={styles.featureSubtitle}>
-                ถามคำถามเกี่ยวกับการท่องเที่ยว
-              </Text>
-            </View>
-            <ChevronRight size={24} color="#CBD5E1" strokeWidth={2} />
-          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>AI ช่วยวางแผน</Text>
+          {aiFeatures.map((feature, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.aiFeatureCard}
+              onPress={() => navigation.navigate(feature.screen)}
+            >
+              <View style={styles.aiFeatureIconContainer}>
+                <feature.icon size={24} color="#0066FF" strokeWidth={2.5} />
+              </View>
+              <View style={styles.aiFeatureContent}>
+                <Text style={styles.aiFeatureTitle}>{feature.title}</Text>
+                <Text style={styles.aiFeatureSubtitle}>
+                  {feature.subtitle}
+                </Text>
+              </View>
+              <ChevronRight size={24} color="#CBD5E1" strokeWidth={2} />
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Spacer for bottom */}
@@ -340,52 +315,52 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  aiCard: {
+  heroCard: {
     marginHorizontal: 20,
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
-    padding: 18,
+    padding: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 5,
   },
-  aiCardContent: {
+  heroContent: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
+    alignItems: "flex-start",
+    marginBottom: 16,
   },
-  aiIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  heroIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: "#EFF6FF",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
+    marginRight: 16,
   },
-  aiCardText: {
+  heroText: {
     flex: 1,
   },
-  aiCardTitle: {
-    fontSize: 17,
+  heroTitle: {
+    fontSize: 20,
     fontWeight: "700",
     color: "#0F172A",
-    marginBottom: 4,
-    letterSpacing: -0.3,
+    marginBottom: 6,
+    letterSpacing: -0.4,
   },
-  aiCardSubtitle: {
-    fontSize: 13,
+  heroSubtitle: {
+    fontSize: 14,
     color: "#64748B",
-    lineHeight: 18,
+    lineHeight: 20,
     letterSpacing: 0.1,
   },
-  aiCardButton: {
+  heroButton: {
     backgroundColor: "#0066FF",
-    borderRadius: 10,
-    paddingVertical: 13,
-    paddingHorizontal: 16,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -395,15 +370,15 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  aiCardButtonText: {
+  heroButtonText: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "700",
-    marginRight: 6,
+    marginRight: 8,
     letterSpacing: -0.2,
   },
   section: {
-    marginBottom: 32,
+    marginTop: 24,
     paddingHorizontal: 20,
   },
   sectionHeader: {
@@ -417,24 +392,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#0F172A",
     letterSpacing: -0.5,
-  },
-  sectionSubtitle: {
-    fontSize: 13,
-    color: "#64748B",
-    fontWeight: "500",
-    marginTop: 4,
-    letterSpacing: 0.1,
-  },
-  seeAllButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 2,
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: "#0066FF",
-    fontWeight: "600",
-    letterSpacing: -0.1,
+    marginBottom: 16,
   },
   trendingBadge: {
     flexDirection: "row",
@@ -450,19 +408,17 @@ const styles = StyleSheet.create({
     color: "#10B981",
     fontWeight: "600",
   },
-  quickActionsGrid: {
+  mainFeaturesGrid: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    marginHorizontal: -6,
+    gap: 12,
   },
-  quickActionWrapper: {
-    width: "50%",
-    padding: 6,
+  mainFeatureWrapper: {
+    flex: 1,
   },
-  quickActionCard: {
+  mainFeatureCard: {
     borderRadius: 16,
     padding: 20,
-    minHeight: 140,
+    minHeight: 160,
     justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
@@ -470,140 +426,72 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  quickActionIconContainer: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  mainFeatureIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 14,
   },
-  quickActionTitle: {
-    fontSize: 16,
+  mainFeatureTitle: {
+    fontSize: 17,
     fontWeight: "700",
     color: "#FFFFFF",
-    marginBottom: 4,
+    marginBottom: 6,
     letterSpacing: -0.3,
   },
-  quickActionSubtitle: {
-    fontSize: 12,
+  mainFeatureSubtitle: {
+    fontSize: 13,
     color: "#FFFFFF",
     opacity: 0.95,
     fontWeight: "500",
     letterSpacing: 0.1,
   },
-  destinationsScroll: {
-    paddingRight: 20,
+  servicesGrid: {
+    gap: 12,
   },
-  destinationCard: {
-    width: 260,
+  serviceCard: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    marginRight: 16,
-    overflow: "hidden",
+    borderRadius: 14,
+    padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
-  destinationImageContainer: {
-    height: 160,
-    backgroundColor: "#F1F5F9",
+  serviceIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
-    position: "relative",
+    marginRight: 14,
   },
-  destinationEmoji: {
-    fontSize: 72,
+  serviceInfo: {
+    flex: 1,
   },
-  ratingBadge: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  ratingBadgeText: {
-    fontSize: 13,
+  serviceTitle: {
+    fontSize: 16,
     fontWeight: "700",
     color: "#0F172A",
-    letterSpacing: -0.1,
-  },
-  destinationInfo: {
-    padding: 16,
-  },
-  destinationName: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#0F172A",
-    marginBottom: 6,
+    marginBottom: 4,
     letterSpacing: -0.3,
   },
-  destinationLocationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginBottom: 14,
-  },
-  destinationCountry: {
+  serviceSubtitle: {
     fontSize: 13,
     color: "#64748B",
+    lineHeight: 18,
     fontWeight: "500",
     letterSpacing: 0.1,
   },
-  destinationFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#F1F5F9",
-  },
-  priceLabel: {
-    fontSize: 11,
-    color: "#94A3B8",
-    marginBottom: 3,
-    fontWeight: "500",
-    letterSpacing: 0.2,
-  },
-  destinationPrice: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#EF4444",
-    letterSpacing: -0.5,
-  },
-  bookButton: {
-    backgroundColor: "#0066FF",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    shadowColor: "#0066FF",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  bookButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
-    letterSpacing: -0.1,
-  },
-  featureCard: {
+  aiFeatureCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
@@ -618,7 +506,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
-  featureIconContainer: {
+  aiFeatureIconContainer: {
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -627,17 +515,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 16,
   },
-  featureContent: {
+  aiFeatureContent: {
     flex: 1,
   },
-  featureTitle: {
+  aiFeatureTitle: {
     fontSize: 16,
     fontWeight: "700",
     color: "#0F172A",
     marginBottom: 4,
     letterSpacing: -0.3,
   },
-  featureSubtitle: {
+  aiFeatureSubtitle: {
     fontSize: 13,
     color: "#64748B",
     lineHeight: 18,
