@@ -1,134 +1,181 @@
-# Trail Teller
 
-This project appears to be a web application built with TypeScript and Node.js, set up to run using Docker. This guide will walk you through setting up your local development environment.
+# TrailTeller 
 
-## Prerequisites
+TrailTeller is a **mobile travel-planning prototype** built with **React Native** and powered by **LLM + LangChain**.
+It demonstrates an intelligent workflow for creating personalized itineraries, including destination recommendations, daily plans, budget estimates, and browsing flight/hotel suggestions.
 
-Before you begin, ensure you have the following tools installed on your system:
-* **Git**
-* **[Docker](https://docs.docker.com/get-docker/)**
-* **[Docker Compose](https://docs.docker.com/compose/install/)**
-* **[Node.js](https://nodejs.org/)** (for local development or if you choose not to use Docker)
+This prototype is developed for **SW Case Study (Mae Fah Luang University)** and does **not** include deployed backend services or a production database.
 
 ---
 
-## How to Start Coding (Docker Method)
+## Features
 
-This is the recommended method as the project is already configured with Docker.
+### AI-Powered Itinerary Generator
 
-### 1\. Clone the Repository
+* Generates destinations, activity plans, and travel suggestions
+* Built with **LLM + LangChain**
+* Adjusts plan based on budget, duration, interests, and travel style
 
-First, clone the project to your local machine and navigate into the directory:
+### Travel Planning Interface
 
-```sh
-git clone https://github.com/Nattanan-Petchsuk026/TrailTeller-Projects/tree/main
-cd trail-teller
-```
+* Trip setup: budget, dates, travelers, interests
+* AI-recommended destination
+* View hotel, flight, and restaurant suggestions
+* Editable day-by-day itinerary
 
-### 2\. Set Up Environment Variables
+### Prototype Data Handling
 
-The backend service likely requires environment variables (like database credentials or API keys) to run.
+* Uses **mock JSON** for flights, hotels, and activities
+* Partial, experimental use of **RapidAPI**
+* No backend API or cloud database
 
-1.  Navigate to the backend folder:
-    ```sh
-    cd backend
-    ```
-2.  Create a `.env` file. You may find a `.env.example` file to copy from. If not, create an empty one.
-    ```sh
-    # If .env.example exists:
-    cp .env.example .env
+### Basic Local Authentication
 
-    # If not, create an empty one:
-    touch .env
-    ```
-3.  **Edit the `.env` file** with your code editor. You will need to add the necessary configuration. Look inside the `docker-compose.yaml` file and the `backend` source code (e.g., `backend/src/config.ts` or `index.ts`) to see which variables are required (e.g., `DATABASE_URL`, `POSTGRES_USER`, `POSTGRES_PASSWORD`).
+* Simple login / register
+* Stored using **AsyncStorage**
+* No JWT / OAuth (prototype only)
 
-### 3\. Build and Run with Docker Compose
+---
 
-The `docker-compose.yaml` file at the root of the project contains all the instructions to build and run the application and its services (like a database).
+## 🛠 Tech Stack
 
-1.  Return to the root of the project:
-    ```sh
-    cd ..
-    ```
-2.  Build and start all services in detached mode:
-    ```sh
-    docker-compose up --build -d
-    ```
-      * `--build`: This forces Docker to build the images from the `Dockerfile` (e.g., for the `backend`).
-      * `-d`: This runs the containers in the background.
+| Layer         | Technology               | Purpose                                                          |
+|---------------|--------------------------|------------------------------------------------------------------|
+| Backend       | **Node.js + Express/Nest.js** | Planned backend architecture for future expansion; suitable for I/O-heavy API operations (not implemented in this prototype) |
+| Frontend      | **React Native (Expo)**       | Cross-platform mobile UI for Android/iOS                         |
+| AI Engine     | **LLM API + LangChain**       | AI itinerary & recommendation generation                          |
+| Data Layer    | **Mock JSON + RapidAPI**      | Simulated travel data (flights/hotels/activities)                 |
+| Local Storage | **AsyncStorage**              | Stores trips, preferences, and user data locally on device       |
+| State Mgmt    | **React Hooks**               | Lightweight state and logic handling                              |
 
-Your application should now be running. You can check the `docker-compose.yaml` file for the `ports` definition to see which port the application is available on (e.g., `http://localhost:8000`).
 
-### 4\. Start Coding
+> **Note:**
+> Backend components (Node.js, PostgreSQL, Redis, Stripe, Microservices) mentioned in the Final Report are **target architecture for future expansion**, **not implemented** in this prototype.
 
-You can now open the `backend` folder in your code editor. The Docker setup likely uses a **volume** to mount your local `backend` directory into the container.
+---
 
-This means you can edit the `.ts` files on your machine, and the service running inside the container (likely using `nodemon` or `ts-node-dev`) will automatically detect the changes and restart, allowing you to see your changes live.
+## Installation
 
-To see logs from the running services:
+### 1. Clone Repository
 
 ```sh
-docker-compose logs -f
+git clone https://github.com/Nattanan-Petchsuk026/TrailTeller-Projects.git
+cd TrailTeller-Projects
 ```
 
-To stop the services:
+### 2. Install Dependencies
 
 ```sh
-docker-compose down
+npm install
 ```
 
------
+### 3. Run the App
 
-## (Alternative) Running the Backend Locally
+**Android Emulator / Device:**
 
-If you prefer not to use Docker, you can try to run the backend service directly on your machine.
+```sh
+npm run android
+```
 
-1.  **Install Dependencies:**
+**iOS (macOS only):**
 
-    ```sh
-    cd backend
-    npm install
-    ```
+```sh
+npm run ios
+```
 
-2.  **Run the Database:**
-    You must still provide a database. The easiest way is to run *just* the database from the `docker-compose.yaml` file:
+**Start with Expo:**
 
-    ```sh
-    # From the project root
-    docker-compose up -d db 
-    ```
+```sh
+npm start
+```
 
-    *(Note: This assumes the database service is named `db` in the `docker-compose.yaml` file).*
+Scan QR code to open the app.
 
-3.  **Configure `.env`:**
-    Make sure your `backend/.env` file points to the database (e.g., `DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/DATABASE_NAME`).
+---
 
-4.  **Run the Project:**
-    Check the `scripts` section of `backend/package.json` for the command to start the development server.
+## External APIs (Prototype)
 
-    ```sh
-    # It is likely one of these:
-    npm run dev
-    # or
-    npm start
-    ```
+The prototype integrates partially with:
 
-After cloning, in the backend folder, delete these duplicate/generated folders to avoid conflicts:
-  ```
-backend/activity/
-backend/booking/
-backend/hotel/
-backend/payment/
-backend/recommendation/
- ```
+* Skyscanner API
+* Amadeus API
+* Booking.com API
+* RapidAPI Travel Endpoints
 
+Used only for *demonstration*:
 
+✔ Sample / mock data
+✔ Testing the UI flow
+✘ No real-time pricing
+✘ No real booking flow
 
-This [Docker Compose for Beginners](https://www.youtube.com/watch?v=KQUiICpM_u0) video may be helpful as it explains how to use `docker-compose.yml` files to run services, which is central to this project's setup.
+---
 
+## How the AI Works
 
+TrailTeller uses **LLM + LangChain**:
 
+1. User inputs:
 
+   * Budget
+   * Dates & duration
+   * Number of travelers
+   * Interests & travel style
 
+2. LangChain builds structured prompts
+
+3. The LLM generates:
+
+   * Destination recommendation
+   * Daily itinerary
+   * Hotels, restaurants, and activities
+
+4. App displays formatted results
+
+Example files:
+
+```
+ai/promptTemplate.js
+ai/itineraryChain.js
+ai/formatter.js
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file:
+
+```
+LLM_API_KEY=your_llm_key
+RAPIDAPI_KEY=your_rapidapi_key
+```
+
+If missing, the app falls back to **mock data**.
+
+---
+
+##  Notes for Instructors / Reviewers
+
+* This is an **academic prototype** for **SW Case Study, MFU**
+* Core development focuses on:
+
+  * AI itinerary generation
+  * UI/UX mobile flow
+  * Prototype-level travel data
+* Backend architecture is planned but **not implemented**
+* All trip data is stored locally using AsyncStorage
+
+---
+
+##  Useful Links
+
+**Figma Prototype:**
+[https://www.figma.com/design/Y4nRacs4hpnDgKaIFihhBX/Trailteller?node-id=0-1](https://www.figma.com/design/Y4nRacs4hpnDgKaIFihhBX/Trailteller?node-id=0-1)
+
+**Repository:**
+[https://github.com/Nattanan-Petchsuk026/TrailTeller-Projects](https://github.com/Nattanan-Petchsuk026/TrailTeller-Projects)
+
+ **Final Project Report:**
+Available via LMS submission
 
