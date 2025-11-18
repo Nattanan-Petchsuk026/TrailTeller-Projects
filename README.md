@@ -1,6 +1,8 @@
 
 # TrailTeller 
 
+TrailTeller is an AI-powered mobile prototype that helps users create  personalized travel itineraries. Built for MFU Software Engineering Case 
+Study, this app focuses on demonstrating AI workflow and mobile UX  without backend deployment.
 TrailTeller is a **mobile travel-planning prototype** built with **React Native** and powered by **LLM + LangChain**.
 It demonstrates an intelligent workflow for creating personalized itineraries, including destination recommendations, daily plans, budget estimates, and browsing flight/hotel suggestions.
 
@@ -10,11 +12,7 @@ This prototype is developed for **SW Case Study (Mae Fah Luang University)** and
 
 ## Features
 
-### AI-Powered Itinerary Generator
-
-* Generates destinations, activity plans, and travel suggestions
-* Built with **LLM + LangChain**
-* Adjusts plan based on budget, duration, interests, and travel style
+ 
 
 ### Travel Planning Interface
 
@@ -178,5 +176,6 @@ If missing, the app falls back to **mock data**.
 
  **Final Project Report:**
 Available via LMS submission
+
 
 
