@@ -1,6 +1,10 @@
 
 # TrailTeller 
 
+TrailTeller is an AI-powered mobile prototype that helps users create 
+personalized travel itineraries. Built for MFU Software Engineering Case 
+Study, this app focuses on demonstrating AI workflow and mobile UX 
+without backend deployment.
 TrailTeller is a **mobile travel-planning prototype** built with **React Native** and powered by **LLM + LangChain**.
 It demonstrates an intelligent workflow for creating personalized itineraries, including destination recommendations, daily plans, budget estimates, and browsing flight/hotel suggestions.
 
@@ -15,10 +19,14 @@ This prototype is developed for **SW Case Study (Mae Fah Luang University)** and
 * Generates destinations, activity plans, and travel suggestions
 * Built with **LLM + LangChain**
 * Adjusts plan based on budget, duration, interests, and travel style
+* Generates destination ideas and basic day-by-day itineraries
+* Uses **LLM + LangChain** to structure and format travel suggestions
+* Adapts results based on budget, travel dates, number of travelers, interests, and travel style  
+
 
 ### Travel Planning Interface
 
-* Trip setup: budget, dates, travelers, interests
+* Trip setup form: budget, dates, duration, travelers, interests, travel style  
 * AI-recommended destination
 * View hotel, flight, and restaurant suggestions
 * Editable day-by-day itinerary
@@ -34,7 +42,20 @@ This prototype is developed for **SW Case Study (Mae Fah Luang University)** and
 * Simple login / register
 * Stored using **AsyncStorage**
 * No JWT / OAuth (prototype only)
+* Partial, experimental **RapidAPI** calls (sample endpoints only)  
+* All processing and data handling are done locally on the device
 
+## Scope
+
+* AI-powered itinerary generation (LLM + LangChain)
+* Trip setup interface (budget, dates, interests)
+* Mock-based flight and hotel browsing
+* Basic RapidAPI testing
+* Backend (Node.js, PostgreSQL, Redis)
+* Real-time booking or payments
+* OAuth / JWT / secure authentication
+* Admin dashboard
+* Real-time flight/hotel pricing
 ---
 
 ## Tech Stack
@@ -178,5 +199,6 @@ If missing, the app falls back to **mock data**.
 
  **Final Project Report:**
 Available via LMS submission
+
 
 
