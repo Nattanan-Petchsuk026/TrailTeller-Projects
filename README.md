@@ -37,7 +37,7 @@ This prototype is developed for **SW Case Study (Mae Fah Luang University)** and
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer         | Technology               | Purpose                                                          |
 |---------------|--------------------------|------------------------------------------------------------------|
@@ -178,4 +178,5 @@ If missing, the app falls back to **mock data**.
 
  **Final Project Report:**
 Available via LMS submission
+
 
