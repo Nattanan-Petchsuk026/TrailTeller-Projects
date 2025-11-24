@@ -18,6 +18,7 @@ This prototype is developed for **SW Case Study (Mae Fah Luang University)** and
 
 * Generates destinations, activity plans, and travel suggestions
 * Built with **LLM + LangChain**
+* Adapts results based on budget, travel dates, number of travelers, interests, and travel style  
 * Adjusts plan based on budget, duration, interests, and travel style
 * Generates destination ideas and basic day-by-day itineraries
 * Uses **LLM + LangChain** to structure and format travel suggestions
@@ -36,11 +37,14 @@ This prototype is developed for **SW Case Study (Mae Fah Luang University)** and
 * Uses **mock JSON** for flights, hotels, and activities
 * Partial, experimental use of **RapidAPI**
 * No backend API or cloud database
+* All processing and data handling are done locally on the device
 
 ### Basic Local Authentication
 
 * Simple login / register
 * Stored using **AsyncStorage**
+* Authentication works offline since all data is local
+* Designed purely for demonstrating user flow — not secure for production use
 * No JWT / OAuth (prototype only)
 * Partial, experimental **RapidAPI** calls (sample endpoints only)  
 * All processing and data handling are done locally on the device
@@ -58,6 +62,7 @@ This prototype is developed for **SW Case Study (Mae Fah Luang University)** and
 * Real-time flight/hotel pricing
 ---
 
+
 ## Tech Stack
 
 | Layer         | Technology               | Purpose                                                          |
@@ -74,6 +79,18 @@ This prototype is developed for **SW Case Study (Mae Fah Luang University)** and
 > Backend components (Node.js, PostgreSQL, Redis, Stripe, Microservices) mentioned in the Final Report are **target architecture for future expansion**, **not implemented** in this prototype.
 
 ---
+## Scope
+* AI-powered itinerary generation (LLM + LangChain)
+* Trip setup interface (budget, dates, interests)
+* Mock-based flight and hotel browsing
+* Basic RapidAPI testing (sample endpoints only)
+* Local storage (AsyncStorage)
+* Simple login/register (no JWT)
+* Backend (Node.js, PostgreSQL, Redis)
+* Real-time booking or payments
+* OAuth / JWT / secure authentication
+* Admin dashboard
+* Real-time flight/hotel pricing
 
 ## Installation
 
